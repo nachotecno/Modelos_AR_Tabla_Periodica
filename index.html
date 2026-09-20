@@ -1,20 +1,75 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  </head>
-  <body style="margin:0;">
-  <model-viewer
-  src="lithium-Borh-NPC-GLP.glb"
-  ios-src="Lithium_Borh_NPC_IPHONE.usdz"
-  alt="Litio"
-  ar
-  ar-modes="webxr scene-viewer quick-look"
-  camera-controls
-  auto-rotate
-  style="width:100%; height:100vh;">
-  </model-viewer>
-  </body>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelos Atomicos en RA</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, sans-serif;
+      background: #0d1117;
+      color: #f0f6fc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 15px;
+    }
+    h1 { font-size: 1.5rem; text-align: center; margin-bottom: 25px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      width: 100%;
+      max-width: 1100px;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 14px 6px;
+      text-align: center;
+      text-decoration: none;
+      color: #f0f6fc;
+      font-size: 0.75rem;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .card:hover { transform: translateY(-3px); border-color: #58a6ff; }
+    .num { display: block; font-size: 0.65rem; opacity: 0.5; margin-bottom: 4px; }
+    .name { display: block; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Tabla Periodica en Realidad Aumentada</h1>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const elementos = [
+      "HIDROGENO","HELIO","LITIO","BERILIO","BORO","CARBONO","NITROGENO","OXIGENO","FLUOR","NEON",
+      "SODIO","MAGNESIO","ALUMINIO","SILICIO","FOSFORO","AZUFRE","CLORO","ARGON","POTASIO","CALCIO",
+      "ESCANDIO","TITANIO","VANADIO","CROMO","MANGANESO","HIERRO","COBALTO","NIQUEL","COBRE","ZINC",
+      "GALIO","GERMANIO","ARSENICO","SELENIO","BROMO","KRIPTON","RUBIDIO","ESTRONCIO","ITRIO","ZIRCONIO",
+      "NIOBIO","MOLIBDENO","TECNECIO","RUTENIO","RODIO","PALADIO","PLATA","CADMIO","INDIO","ESTANO",
+      "ANTIMONIO","TELURIO","YODO","XENON","CESIO","BARIO","LANTANO","CERIO","PRASEODIMIO","NEODIMIO",
+      "PROMETIO","SAMARIO","EUROPIO","GADOLINIO","TERBIO","DISPROSIO","HOLMIO","ERBIO","TULIO","ITERBIO",
+      "LUTECIO","HAFNIO","TANTALO","WOLFRAMIO","RENIO","OSMIO","IRIDIO","PLATINO","ORO","MERCURIO",
+      "TALIO","PLOMO","BISMUTO","POLONIO","ASTATO","RADON","FRANCIO","RADIO","ACTINIO","TORIO",
+      "PROTACTINIO","URANIO","NEPTUNIO","PLUTONIO","AMERICIO","CURIO","BERKELIO","CALIFORNIO","EINSTENIO","FERMIO",
+      "MENDELEVIO","NOBELIO","LAURENCIO","RUTHERFORDIO","DUBNIO","SEABORGIO","BOHRIO","HASSIO","MEITNERIO","DARMSTATIO",
+      "ROENTGENIO","COPERNICIO","NIHONIO","FLEROVIO","MOSCOVIO","LIVERMORIO","TENESO","OGANESON"
+    ];
+
+    const grid = document.getElementById('grid');
+    elementos.forEach((nombre, i) => {
+      const numero = String(i + 1).padStart(2, '0');
+      const carpeta = `${numero}-${nombre.toLowerCase()}`;
+      const archivo = `${numero}-${nombre}.html`;
+      const card = document.createElement('a');
+      card.className = 'card';
+      card.href = `modelos/${carpeta}/${archivo}`;
+      card.innerHTML = `<span class="num">${numero}</span><span class="name">${nombre}</span>`;
+      grid.appendChild(card);
+    });
+  </script>
+</body>
 </html>
