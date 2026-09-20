@@ -1,0 +1,53 @@
+name: Generar estructura de elementos
+on:
+  workflow_dispatch:
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Crear carpetas y HTML de cada elemento
+        run: |
+          elementos=(HIDROGENO HELIO LITIO BERILIO BORO CARBONO NITROGENO OXIGENO FLUOR NEON SODIO MAGNESIO ALUMINIO SILICIO FOSFORO AZUFRE CLORO ARGON POTASIO CALCIO ESCANDIO TITANIO VANADIO CROMO MANGANESO HIERRO COBALTO NIQUEL COBRE ZINC GALIO GERMANIO ARSENICO SELENIO BROMO KRIPTON RUBIDIO ESTRONCIO ITRIO ZIRCONIO NIOBIO MOLIBDENO TECNECIO RUTENIO RODIO PALADIO PLATA CADMIO INDIO ESTANO ANTIMONIO TELURIO YODO XENON CESIO BARIO LANTANO CERIO PRASEODIMIO NEODIMIO PROMETIO SAMARIO EUROPIO GADOLINIO TERBIO DISPROSIO HOLMIO ERBIO TULIO ITERBIO LUTECIO HAFNIO TANTALO WOLFRAMIO RENIO OSMIO IRIDIO PLATINO ORO MERCURIO TALIO PLOMO BISMUTO POLONIO ASTATO RADON FRANCIO RADIO ACTINIO TORIO PROTACTINIO URANIO NEPTUNIO PLUTONIO AMERICIO CURIO BERKELIO CALIFORNIO EINSTENIO FERMIO MENDELEVIO NOBELIO LAURENCIO RUTHERFORDIO DUBNIO SEABORGIO BOHRIO HASSIO MEITNERIO DARMSTATIO ROENTGENIO COPERNICIO NIHONIO FLEROVIO MOSCOVIO LIVERMORIO TENESO OGANESON)
+
+          for i in "${!elementos[@]}"; do
+            num=$(printf "%02d" $((i+1)))
+            nombre="${elementos[$i]}"
+            carpeta="modelos/${num}-$(echo "$nombre" | tr '[:upper:]' '[:lower:]')"
+            archivo="${carpeta}/${num}-${nombre}.html"
+
+            if [ ! -f "$archivo" ]; then
+              mkdir -p "$carpeta"
+              printf '%s\n' \
+          '<!DOCTYPE html>' \
+          '<html>' \
+          '  <head>' \
+          '    <meta charset="utf-8">' \
+          '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' \
+          '    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>' \
+          '  </head>' \
+          '  <body style="margin:0;">' \
+          "  <model-viewer" \
+          "  src=\"${num}-${nombre}-ANDROID.glb\"" \
+          "  ios-src=\"${num}-${nombre}-IPHONE.usdz\"" \
+          "  alt=\"${nombre}\"" \
+          '  ar' \
+          '  ar-modes="webxr scene-viewer quick-look"' \
+          '  camera-controls' \
+          '  auto-rotate' \
+          '  style="width:100%; height:100vh;">' \
+          '  </model-viewer>' \
+          '  </body>' \
+          '</html>' > "$archivo"
+            fi
+          done
+
+      - name: Commit y push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add modelos/
+          git commit -m "Generar estructura de carpetas y HTML para 118 elementos" || echo "Nada que commitear"
+          git push
