@@ -3,388 +3,416 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tabla Periódica en Realidad Aumentada (IUPAC)</title>
+  <title>Tabla Periódica - Modelos AR 3D</title>
   <style>
+    :root {
+      --bg-color: #0f141c;
+      --card-bg: #1a2232;
+      --text-main: #f0f4f8;
+      
+      /* Colores póster IUPAC */
+      --c-alcalinos: #ff6f61;        /* Rojo / Salmón */
+      --c-alcalinoterreos: #ffb74d;  /* Naranja */
+      --c-transicion: #ffe082;       /* Amarillo suave */
+      --c-otros-metales: #80cbc4;    /* Verde agua / turquesa */
+      --c-semimetales: #2e7d32;      /* Verde oscuro */
+      --c-no-metales: #90caf9;       /* Azul claro */
+      --c-halogenos: #1565c0;        /* Azul oscuro */
+      --c-gases-nobles: #ce93d8;     /* Púrpura / Lila */
+      --c-lantanidos: #f48fb1;       /* Rosa */
+      --c-actinidos: #b39ddb;        /* Violeta claro */
+    }
+
     * {
       box-sizing: border-box;
-    }
-    body {
       margin: 0;
-      padding: 20px 10px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background: #f4f6f8;
-      color: #111;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 18px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
+    header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
     h1 {
       font-size: 1.6rem;
-      margin: 0 0 4px 0;
-      text-align: center;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      margin-bottom: 4px;
     }
-    .subtitle {
+
+    p.subtitle {
       font-size: 0.9rem;
-      color: #555;
-      margin-bottom: 20px;
-      text-align: center;
+      color: #94a3b8;
     }
-    /* Contenedor con scroll horizontal para móviles */
-    .table-wrapper {
+
+    /* Contenedor con scroll horizontal suave para móviles */
+    .table-viewport {
       width: 100%;
+      max-width: 1240px;
       overflow-x: auto;
-      padding-bottom: 20px;
-      display: flex;
-      justify-content: center;
+      padding-bottom: 12px;
     }
-    .periodic-table {
+
+    /* Rejilla oficial de 18 columnas */
+    .periodic-grid {
       display: grid;
-      grid-template-columns: repeat(18, 60px);
-      grid-template-rows: repeat(7, 68px) 16px repeat(2, 68px);
-      gap: 3px;
-      background: #fff;
-      padding: 12px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      min-width: 1100px;
+      grid-template-columns: repeat(18, minmax(62px, 1fr));
+      grid-template-rows: repeat(10, minmax(62px, auto));
+      gap: 4px;
+      min-width: 1140px;
+      margin: 0 auto;
     }
+
+    /* Estilo base de celda / botón del elemento */
     .element-card {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      border-radius: 5px;
       text-decoration: none;
-      border: 1px solid rgba(0,0,0,0.18);
-      border-radius: 3px;
-      padding: 2px 2px;
+      padding: 3px 2px;
       position: relative;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      user-select: none;
     }
+
     .element-card:hover {
-      transform: scale(1.12);
+      transform: translateY(-2px) scale(1.05);
       z-index: 10;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      filter: brightness(1.05);
+      filter: brightness(1.12);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
     }
+
     .atomic-num {
       position: absolute;
       top: 2px;
       left: 3px;
-      font-size: 0.58rem;
-      font-weight: 600;
-      line-height: 1;
+      font-size: 9px;
+      font-weight: 700;
       opacity: 0.85;
+      line-height: 1;
     }
+
     .symbol {
-      font-size: 1.3rem;
+      font-size: 19px;
       font-weight: 800;
-      line-height: 1.05;
+      line-height: 1.1;
       margin-top: 5px;
     }
+
     .name {
-      font-size: 0.65rem;
+      font-size: 9.5px;
       font-weight: 600;
-      line-height: 1.05;
-      margin-top: 3px;
-      max-width: 56px;
+      line-height: 1.1;
+      text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-align: center;
+      max-width: 96%;
     }
-    /* Placeholder no interactivo para casillas 57-71 y 89-103 */
-    .placeholder {
+
+    /* Ajuste especial y único para el Rutherfordio */
+    .element-card[data-symbol="Rf"] .name {
+      font-size: 8px !important;
+      letter-spacing: -0.3px;
+    }
+
+    /* Casillas marcadoras de serie Lantánidos y Actínidos */
+    .series-marker {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border: 1px dashed rgba(0,0,0,0.25);
-      border-radius: 3px;
-      font-size: 0.6rem;
-      font-weight: bold;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 700;
       text-align: center;
+      padding: 4px;
       line-height: 1.15;
-      padding: 2px;
-      cursor: default;
+      border: 1px dashed rgba(255, 255, 255, 0.3);
     }
 
-    /* ========================================================
-       PALETA DE COLORES AJUSTADA A TUS CORRECCIONES
-       ======================================================== */
-    /* 1. Alcalinos: Rojo vivo, letra blanca */
-    .c-alkali {
-      background: #e21c25;
-      color: #ffffff;
-    }
-    /* 2. Alcalinotérreos: Naranja, letra negra */
-    .c-alkaline-earth {
-      background: #f7941d;
-      color: #000000;
-    }
-    /* 3. Metales de transición: Amarillo, letra negra */
-    .c-transition {
-      background: #fff200;
-      color: #000000;
-    }
-    /* 4. Metales del bloque p: Verde claro, letra negra */
-    .c-post-metal {
-      background: #52c41a;
-      color: #000000;
-    }
-    /* 5. Semimetales (B, Si, Ge, As, Sb, Te, Po): Verde oscuro, letra blanca */
-    .c-semimetal {
-      background: #0b9444;
-      color: #ffffff;
-    }
-    /* 6. No metales (H, C, N, O, P, S, Se): Azul claro, letra negra */
-    .c-light-blue {
-      background: #72c6f1;
-      color: #000000;
-    }
-    /* 7. Halógenos (F, Cl, Br, I, At, Ts): Azul oscuro, letra blanca */
-    .c-halogen {
-      background: #0066b3;
-      color: #ffffff;
-    }
-    /* 8. Gases nobles: Rosa claro pastel, letra negra */
-    .c-noble-gas {
-      background: #f7b7cf;
-      color: #000000;
-    }
-    /* 9. Lantánidos (57-71): Gris claro azulado / plata, letra negra */
-    .c-lanthanide {
-      background: #d6d9e0;
-      color: #000000;
-    }
-    /* 10. Actínidos (89-103): Azul violeta / añil, letra blanca */
-    .c-actinide {
-      background: #4754a5;
-      color: #ffffff;
+    /* Clases de Color según póster IUPAC */
+    .alcalinos { background-color: var(--c-alcalinos); color: #000000; }
+    .alcalinoterreos { background-color: var(--c-alcalinoterreos); color: #000000; }
+    .transicion { background-color: var(--c-transicion); color: #000000; }
+    .otros-metales { background-color: var(--c-otros-metales); color: #000000; }
+    .semimetales { background-color: var(--c-semimetales); color: #ffffff; }
+    .no-metales { background-color: var(--c-no-metales); color: #000000; }
+    .halogenos { background-color: var(--c-halogenos); color: #ffffff; }
+    .gases-nobles { background-color: var(--c-gases-nobles); color: #000000; }
+    .lantanidos { background-color: var(--c-lantanidos); color: #000000; }
+    .actinidos { background-color: var(--c-actinidos); color: #000000; }
+
+    /* Fila vacía separadora entre tabla principal y tierras raras */
+    .row-separator {
+      grid-column: 1 / span 18;
+      height: 12px;
     }
 
-    /* Leyenda inferior */
+    /* Leyenda inferior en UNA SOLA LÍNEA */
+    .legend-container {
+      width: 100%;
+      max-width: 1240px;
+      margin-top: 14px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
     .legend {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap; /* Evita que salte de línea */
       justify-content: center;
-      gap: 12px;
-      max-width: 950px;
-      margin-top: 10px;
-      font-size: 0.75rem;
+      align-items: center;
+      gap: 10px;
+      min-width: 980px; /* Asegura lectura cómoda */
+      background: #141c28;
+      padding: 9px 14px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
+
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #cbd5e1;
+      white-space: nowrap;
     }
-    .legend-box {
+
+    .legend-color {
       width: 14px;
       height: 14px;
-      border-radius: 2px;
-      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 3px;
+      flex-shrink: 0;
     }
   </style>
 </head>
 <body>
-  <h1>Tabla Periódica de los Elementos en Realidad Aumentada</h1>
-  <div class="subtitle">Selecciona un elemento para visualizar su modelo atómico 3D y en RA</div>
 
-  <div class="table-wrapper">
-    <div class="periodic-table" id="table"></div>
+  <header>
+    <h1>Tabla Periódica de los Elementos en Realidad Aumentada</h1>
+    <p class="subtitle">Pulsa sobre cualquier elemento para ver su modelo atómico de Bohr en 3D y RA (iPhone / Android / PC)</p>
+  </header>
+
+  <div class="table-viewport">
+    <main class="periodic-grid" id="periodicTable">
+      <!-- Los 118 elementos se colocan dinámicamente con las coordenadas exactas de la IUPAC -->
+    </main>
   </div>
 
-  <div class="legend">
-    <div class="legend-item"><div class="legend-box" style="background:#e21c25"></div> Alcalinos</div>
-    <div class="legend-item"><div class="legend-box" style="background:#f7941d"></div> Alcalinotérreos</div>
-    <div class="legend-item"><div class="legend-box" style="background:#fff200"></div> Metales de transición</div>
-    <div class="legend-item"><div class="legend-box" style="background:#52c41a"></div> Metales bloque p</div>
-    <div class="legend-item"><div class="legend-box" style="background:#0b9444"></div> Semimetales</div>
-    <div class="legend-item"><div class="legend-box" style="background:#72c6f1"></div> No metales / H</div>
-    <div class="legend-item"><div class="legend-box" style="background:#0066b3"></div> Halógenos</div>
-    <div class="legend-item"><div class="legend-box" style="background:#f7b7cf"></div> Gases nobles</div>
-    <div class="legend-item"><div class="legend-box" style="background:#d6d9e0"></div> Lantánidos</div>
-    <div class="legend-item"><div class="legend-box" style="background:#4754a5"></div> Actínidos</div>
+  <!-- Leyenda de colores IUPAC en una sola fila continua -->
+  <div class="legend-container">
+    <footer class="legend">
+      <div class="legend-item"><span class="legend-color alcalinos"></span>Alcalinos</div>
+      <div class="legend-item"><span class="legend-color alcalinoterreos"></span>Alcalinotérreos</div>
+      <div class="legend-item"><span class="legend-color transicion"></span>Metales de transición</div>
+      <div class="legend-item"><span class="legend-color otros-metales"></span>Otros metales</div>
+      <div class="legend-item"><span class="legend-color semimetales"></span>Semimetales</div>
+      <div class="legend-item"><span class="legend-color no-metales"></span>No metales</div>
+      <div class="legend-item"><span class="legend-color halogenos"></span>Halógenos</div>
+      <div class="legend-item"><span class="legend-color gases-nobles"></span>Gases nobles</div>
+      <div class="legend-item"><span class="legend-color lantanidos"></span>Lantánidos</div>
+      <div class="legend-item"><span class="legend-color actinidos"></span>Actínidos</div>
+    </footer>
   </div>
 
   <script>
+    // Datos completos de los 118 elementos con la clasificación de colores y coordenadas IUPAC solicitadas
     const elements = [
-      // Período 1
-      { n: 1, s: "H", name: "Hidrogeno", c: 1, r: 1, color: "c-light-blue" },
-      { n: 2, s: "He", name: "Helio", c: 18, r: 1, color: "c-noble-gas" },
+      // Periodo 1
+      { n: 1, s: "H", name: "Hidrógeno", row: 1, col: 1, cat: "no-metales", folder: "01-hidrogeno", file: "01-HIDROGENO" },
+      { n: 2, s: "He", name: "Helio", row: 1, col: 18, cat: "gases-nobles", folder: "02-helio", file: "02-HELIO" },
 
-      // Período 2
-      { n: 3, s: "Li", name: "Litio", c: 1, r: 2, color: "c-alkali" },
-      { n: 4, s: "Be", name: "Berilio", c: 2, r: 2, color: "c-alkaline-earth" },
-      { n: 5, s: "B", name: "Boro", c: 13, r: 2, color: "c-semimetal" },
-      { n: 6, s: "C", name: "Carbono", c: 14, r: 2, color: "c-light-blue" },
-      { n: 7, s: "N", name: "Nitrogeno", c: 15, r: 2, color: "c-light-blue" },
-      { n: 8, s: "O", name: "Oxigeno", c: 16, r: 2, color: "c-light-blue" },
-      { n: 9, s: "F", name: "Fluor", c: 17, r: 2, color: "c-halogen" },
-      { n: 10, s: "Ne", name: "Neon", c: 18, r: 2, color: "c-noble-gas" },
+      // Periodo 2
+      { n: 3, s: "Li", name: "Litio", row: 2, col: 1, cat: "alcalinos", folder: "03-litio", file: "03-LITIO" },
+      { n: 4, s: "Be", name: "Berilio", row: 2, col: 2, cat: "alcalinoterreos", folder: "04-berilio", file: "04-BERILIO" },
+      { n: 5, s: "B", name: "Boro", row: 2, col: 13, cat: "semimetales", folder: "05-boro", file: "05-BORO" },
+      { n: 6, s: "C", name: "Carbono", row: 2, col: 14, cat: "no-metales", folder: "06-carbono", file: "06-CARBONO" },
+      { n: 7, s: "N", name: "Nitrógeno", row: 2, col: 15, cat: "no-metales", folder: "07-nitrogeno", file: "07-NITROGENO" },
+      { n: 8, s: "O", name: "Oxígeno", row: 2, col: 16, cat: "no-metales", folder: "08-oxigeno", file: "08-OXIGENO" },
+      { n: 9, s: "F", name: "Flúor", row: 2, col: 17, cat: "halogenos", folder: "09-fluor", file: "09-FLUOR" },
+      { n: 10, s: "Ne", name: "Neón", row: 2, col: 18, cat: "gases-nobles", folder: "10-neon", file: "10-NEON" },
 
-      // Período 3
-      { n: 11, s: "Na", name: "Sodio", c: 1, r: 3, color: "c-alkali" },
-      { n: 12, s: "Mg", name: "Magnesio", c: 2, r: 3, color: "c-alkaline-earth" },
-      { n: 13, s: "Al", name: "Aluminio", c: 13, r: 3, color: "c-post-metal" },
-      { n: 14, s: "Si", name: "Silicio", c: 14, r: 3, color: "c-semimetal" },
-      { n: 15, s: "P", name: "Fosforo", c: 15, r: 3, color: "c-light-blue" },
-      { n: 16, s: "S", name: "Azufre", c: 16, r: 3, color: "c-light-blue" },
-      { n: 17, s: "Cl", name: "Cloro", c: 17, r: 3, color: "c-halogen" },
-      { n: 18, s: "Ar", name: "Argon", c: 18, r: 3, color: "c-noble-gas" },
+      // Periodo 3
+      { n: 11, s: "Na", name: "Sodio", row: 3, col: 1, cat: "alcalinos", folder: "11-sodio", file: "11-SODIO" },
+      { n: 12, s: "Mg", name: "Magnesio", row: 3, col: 2, cat: "alcalinoterreos", folder: "12-magnesio", file: "12-MAGNESIO" },
+      { n: 13, s: "Al", name: "Aluminio", row: 3, col: 13, cat: "otros-metales", folder: "13-aluminio", file: "13-ALUMINIO" },
+      { n: 14, s: "Si", name: "Silicio", row: 3, col: 14, cat: "semimetales", folder: "14-silicio", file: "14-SILICIO" },
+      { n: 15, s: "P", name: "Fósforo", row: 3, col: 15, cat: "no-metales", folder: "15-fosforo", file: "15-FOSFORO" },
+      { n: 16, s: "S", name: "Azufre", row: 3, col: 16, cat: "no-metales", folder: "16-azufre", file: "16-AZUFRE" },
+      { n: 17, s: "Cl", name: "Cloro", row: 3, col: 17, cat: "halogenos", folder: "17-cloro", file: "17-CLORO" },
+      { n: 18, s: "Ar", name: "Argón", row: 3, col: 18, cat: "gases-nobles", folder: "18-argon", file: "18-ARGON" },
 
-      // Período 4
-      { n: 19, s: "K", name: "Potasio", c: 1, r: 4, color: "c-alkali" },
-      { n: 20, s: "Ca", name: "Calcio", c: 2, r: 4, color: "c-alkaline-earth" },
-      { n: 21, s: "Sc", name: "Escandio", c: 3, r: 4, color: "c-transition" },
-      { n: 22, s: "Ti", name: "Titanio", c: 4, r: 4, color: "c-transition" },
-      { n: 23, s: "V", name: "Vanadio", c: 5, r: 4, color: "c-transition" },
-      { n: 24, s: "Cr", name: "Cromo", c: 6, r: 4, color: "c-transition" },
-      { n: 25, s: "Mn", name: "Manganeso", c: 7, r: 4, color: "c-transition" },
-      { n: 26, s: "Fe", name: "Hierro", c: 8, r: 4, color: "c-transition" },
-      { n: 27, s: "Co", name: "Cobalto", c: 9, r: 4, color: "c-transition" },
-      { n: 28, s: "Ni", name: "Niquel", c: 10, r: 4, color: "c-transition" },
-      { n: 29, s: "Cu", name: "Cobre", c: 11, r: 4, color: "c-transition" },
-      { n: 30, s: "Zn", name: "Zinc", c: 12, r: 4, color: "c-transition" },
-      { n: 31, s: "Ga", name: "Galio", c: 13, r: 4, color: "c-post-metal" },
-      { n: 32, s: "Ge", name: "Germanio", c: 14, r: 4, color: "c-semimetal" },
-      { n: 33, s: "As", name: "Arsenico", c: 15, r: 4, color: "c-semimetal" },
-      { n: 34, s: "Se", name: "Selenio", c: 16, r: 4, color: "c-light-blue" },
-      { n: 35, s: "Br", name: "Bromo", c: 17, r: 4, color: "c-halogen" },
-      { n: 36, s: "Kr", name: "Kripton", c: 18, r: 4, color: "c-noble-gas" },
+      // Periodo 4
+      { n: 19, s: "K", name: "Potasio", row: 4, col: 1, cat: "alcalinos", folder: "19-potasio", file: "19-POTASIO" },
+      { n: 20, s: "Ca", name: "Calcio", row: 4, col: 2, cat: "alcalinoterreos", folder: "20-calcio", file: "20-CALCIO" },
+      { n: 21, s: "Sc", name: "Escandio", row: 4, col: 3, cat: "transicion", folder: "21-escandio", file: "21-ESCANDIO" },
+      { n: 22, s: "Ti", name: "Titanio", row: 4, col: 4, cat: "transicion", folder: "22-titanio", file: "22-TITANIO" },
+      { n: 23, s: "V", name: "Vanadio", row: 4, col: 5, cat: "transicion", folder: "23-vanadio", file: "23-VANADIO" },
+      { n: 24, s: "Cr", name: "Cromo", row: 4, col: 6, cat: "transicion", folder: "24-cromo", file: "24-CROMO" },
+      { n: 25, s: "Mn", name: "Manganeso", row: 4, col: 7, cat: "transicion", folder: "25-manganeso", file: "25-MANGANESO" },
+      { n: 26, s: "Fe", name: "Hierro", row: 4, col: 8, cat: "transicion", folder: "26-hierro", file: "26-HIERRO" },
+      { n: 27, s: "Co", name: "Cobalto", row: 4, col: 9, cat: "transicion", folder: "27-cobalto", file: "27-COBALTO" },
+      { n: 28, s: "Ni", name: "Níquel", row: 4, col: 10, cat: "transicion", folder: "28-niquel", file: "28-NIQUEL" },
+      { n: 29, s: "Cu", name: "Cobre", row: 4, col: 11, cat: "transicion", folder: "29-cobre", file: "29-COBRE" },
+      { n: 30, s: "Zn", name: "Cinc", row: 4, col: 12, cat: "transicion", folder: "30-cinc", file: "30-CINC" },
+      { n: 31, s: "Ga", name: "Galio", row: 4, col: 13, cat: "otros-metales", folder: "31-galio", file: "31-GALIO" },
+      { n: 32, s: "Ge", name: "Germanio", row: 4, col: 14, cat: "semimetales", folder: "32-germanio", file: "32-GERMANIO" },
+      { n: 33, s: "As", name: "Arsénico", row: 4, col: 15, cat: "semimetales", folder: "33-arsenico", file: "33-ARSENICO" },
+      { n: 34, s: "Se", name: "Selenio", row: 4, col: 16, cat: "no-metales", folder: "34-selenio", file: "34-SELENIO" },
+      { n: 35, s: "Br", name: "Bromo", row: 4, col: 17, cat: "halogenos", folder: "35-bromo", file: "35-BROMO" },
+      { n: 36, s: "Kr", name: "Kriptón", row: 4, col: 18, cat: "gases-nobles", folder: "36-kripton", file: "36-KRIPTON" },
 
-      // Período 5
-      { n: 37, s: "Rb", name: "Rubidio", c: 1, r: 5, color: "c-alkali" },
-      { n: 38, s: "Sr", name: "Estroncio", c: 2, r: 5, color: "c-alkaline-earth" },
-      { n: 39, s: "Y", name: "Itrio", c: 3, r: 5, color: "c-transition" },
-      { n: 40, s: "Zr", name: "Zirconio", c: 4, r: 5, color: "c-transition" },
-      { n: 41, s: "Nb", name: "Niobio", c: 5, r: 5, color: "c-transition" },
-      { n: 42, s: "Mo", name: "Molibdeno", c: 6, r: 5, color: "c-transition" },
-      { n: 43, s: "Tc", name: "Tecnecio", c: 7, r: 5, color: "c-transition" },
-      { n: 44, s: "Ru", name: "Rutenio", c: 8, r: 5, color: "c-transition" },
-      { n: 45, s: "Rh", name: "Rodio", c: 9, r: 5, color: "c-transition" },
-      { n: 46, s: "Pd", name: "Paladio", c: 10, r: 5, color: "c-transition" },
-      { n: 47, s: "Ag", name: "Plata", c: 11, r: 5, color: "c-transition" },
-      { n: 48, s: "Cd", name: "Cadmio", c: 12, r: 5, color: "c-transition" },
-      { n: 49, s: "In", name: "Indio", c: 13, r: 5, color: "c-post-metal" },
-      { n: 50, s: "Sn", name: "Estano", c: 14, r: 5, color: "c-post-metal" },
-      { n: 51, s: "Sb", name: "Antimonio", c: 15, r: 5, color: "c-semimetal" },
-      { n: 52, s: "Te", name: "Telurio", c: 16, r: 5, color: "c-semimetal" },
-      { n: 53, s: "I", name: "Yodo", c: 17, r: 5, color: "c-halogen" },
-      { n: 54, s: "Xe", name: "Xenon", c: 18, r: 5, color: "c-noble-gas" },
+      // Periodo 5
+      { n: 37, s: "Rb", name: "Rubidio", row: 5, col: 1, cat: "alcalinos", folder: "37-rubidio", file: "37-RUBIDIO" },
+      { n: 38, s: "Sr", name: "Estroncio", row: 5, col: 2, cat: "alcalinoterreos", folder: "38-estroncio", file: "38-ESTRONCIO" },
+      { n: 39, s: "Y", name: "Itrio", row: 5, col: 3, cat: "transicion", folder: "39-itrio", file: "39-ITRIO" },
+      { n: 40, s: "Zr", name: "Circonio", row: 5, col: 4, cat: "transicion", folder: "40-circonio", file: "40-CIRCONIO" },
+      { n: 41, s: "Nb", name: "Niobio", row: 5, col: 5, cat: "transicion", folder: "41-niobio", file: "41-NIOBIO" },
+      { n: 42, s: "Mo", name: "Molibdeno", row: 5, col: 6, cat: "transicion", folder: "42-molibdeno", file: "42-MOLIBDENO" },
+      { n: 43, s: "Tc", name: "Tecnecio", row: 5, col: 7, cat: "transicion", folder: "43-tecnecio", file: "43-TECNECIO" },
+      { n: 44, s: "Ru", name: "Rutenio", row: 5, col: 8, cat: "transicion", folder: "44-rutenio", file: "44-RUTENIO" },
+      { n: 45, s: "Rh", name: "Rodio", row: 5, col: 9, cat: "transicion", folder: "45-rodio", file: "45-RODIO" },
+      { n: 46, s: "Pd", name: "Paladio", row: 5, col: 10, cat: "transicion", folder: "46-paladio", file: "46-PALADIO" },
+      { n: 47, s: "Ag", name: "Plata", row: 5, col: 11, cat: "transicion", folder: "47-plata", file: "47-PLATA" },
+      { n: 48, s: "Cd", name: "Cadmio", row: 5, col: 12, cat: "transicion", folder: "48-cadmio", file: "48-CADMIO" },
+      { n: 49, s: "In", name: "Indio", row: 5, col: 13, cat: "otros-metales", folder: "49-indio", file: "49-INDIO" },
+      { n: 50, s: "Sn", name: "Estaño", row: 5, col: 14, cat: "otros-metales", folder: "50-estano", file: "50-ESTANO" },
+      { n: 51, s: "Sb", name: "Antimonio", row: 5, col: 15, cat: "semimetales", folder: "51-antimonio", file: "51-ANTIMONIO" },
+      { n: 52, s: "Te", name: "Teluro", row: 5, col: 16, cat: "semimetales", folder: "52-teluro", file: "52-TELURO" },
+      { n: 53, s: "I", name: "Yodo", row: 5, col: 17, cat: "halogenos", folder: "53-yodo", file: "53-YODO" },
+      { n: 54, s: "Xe", name: "Xenón", row: 5, col: 18, cat: "gases-nobles", folder: "54-xenon", file: "54-XENON" },
 
-      // Período 6
-      { n: 55, s: "Cs", name: "Cesio", c: 1, r: 6, color: "c-alkali" },
-      { n: 56, s: "Ba", name: "Bario", c: 2, r: 6, color: "c-alkaline-earth" },
-      { n: 72, s: "Hf", name: "Hafnio", c: 4, r: 6, color: "c-transition" },
-      { n: 73, s: "Ta", name: "Tantalo", c: 5, r: 6, color: "c-transition" },
-      { n: 74, s: "W", name: "Wolframio", c: 6, r: 6, color: "c-transition" },
-      { n: 75, s: "Re", name: "Renio", c: 7, r: 6, color: "c-transition" },
-      { n: 76, s: "Os", name: "Osmio", c: 8, r: 6, color: "c-transition" },
-      { n: 77, s: "Ir", name: "Iridio", c: 9, r: 6, color: "c-transition" },
-      { n: 78, s: "Pt", name: "Platino", c: 10, r: 6, color: "c-transition" },
-      { n: 79, s: "Au", name: "Oro", c: 11, r: 6, color: "c-transition" },
-      { n: 80, s: "Hg", name: "Mercurio", c: 12, r: 6, color: "c-transition" },
-      { n: 81, s: "Tl", name: "Talio", c: 13, r: 6, color: "c-post-metal" },
-      { n: 82, s: "Pb", name: "Plomo", c: 14, r: 6, color: "c-post-metal" },
-      { n: 83, s: "Bi", name: "Bismuto", c: 15, r: 6, color: "c-post-metal" },
-      { n: 84, s: "Po", name: "Polonio", c: 16, r: 6, color: "c-semimetal" },
-      { n: 85, s: "At", name: "Astato", c: 17, r: 6, color: "c-halogen" },
-      { n: 86, s: "Rn", name: "Radon", c: 18, r: 6, color: "c-noble-gas" },
+      // Periodo 6
+      { n: 55, s: "Cs", name: "Cesio", row: 6, col: 1, cat: "alcalinos", folder: "55-cesio", file: "55-CESIO" },
+      { n: 56, s: "Ba", name: "Bario", row: 6, col: 2, cat: "alcalinoterreos", folder: "56-bario", file: "56-BARIO" },
+      // 57-71 Lantánidos en fila 9
+      { n: 72, s: "Hf", name: "Hafnio", row: 6, col: 4, cat: "transicion", folder: "72-hafnio", file: "72-HAFNIO" },
+      { n: 73, s: "Ta", name: "Tántalo", row: 6, col: 5, cat: "transicion", folder: "73-tantalo", file: "73-TANTALO" },
+      { n: 74, s: "W", name: "Wolframio", row: 6, col: 6, cat: "transicion", folder: "74-wolframio", file: "74-WOLFRAMIO" },
+      { n: 75, s: "Re", name: "Renio", row: 6, col: 7, cat: "transicion", folder: "75-renio", file: "75-RENIO" },
+      { n: 76, s: "Os", name: "Osmio", row: 6, col: 8, cat: "transicion", folder: "76-osmio", file: "76-OSMIO" },
+      { n: 77, s: "Ir", name: "Iridio", row: 6, col: 9, cat: "transicion", folder: "77-iridio", file: "77-IRIDIO" },
+      { n: 78, s: "Pt", name: "Platino", row: 6, col: 10, cat: "transicion", folder: "78-platino", file: "78-PLATINO" },
+      { n: 79, s: "Au", name: "Oro", row: 6, col: 11, cat: "transicion", folder: "79-oro", file: "79-ORO" },
+      { n: 80, s: "Hg", name: "Mercurio", row: 6, col: 12, cat: "transicion", folder: "80-mercurio", file: "80-MERCURIO" },
+      { n: 81, s: "Tl", name: "Talio", row: 6, col: 13, cat: "otros-metales", folder: "81-talio", file: "81-TALIO" },
+      { n: 82, s: "Pb", name: "Plomo", row: 6, col: 14, cat: "otros-metales", folder: "82-plomo", file: "82-PLOMO" },
+      { n: 83, s: "Bi", name: "Bismuto", row: 6, col: 15, cat: "otros-metales", folder: "83-bismuto", file: "83-BISMUTO" },
+      { n: 84, s: "Po", name: "Polonio", row: 6, col: 16, cat: "semimetales", folder: "84-polonio", file: "84-POLONIO" },
+      { n: 85, s: "At", name: "Astato", row: 6, col: 17, cat: "halogenos", folder: "85-astato", file: "85-ASTATO" },
+      { n: 86, s: "Rn", name: "Radón", row: 6, col: 18, cat: "gases-nobles", folder: "86-radon", file: "86-RADON" },
 
-      // Período 7
-      { n: 87, s: "Fr", name: "Francio", c: 1, r: 7, color: "c-alkali" },
-      { n: 88, s: "Ra", name: "Radio", c: 2, r: 7, color: "c-alkaline-earth" },
-      { n: 104, s: "Rf", name: "Rutherfordio", c: 4, r: 7, color: "c-transition" },
-      { n: 105, s: "Db", name: "Dubnio", c: 5, r: 7, color: "c-transition" },
-      { n: 106, s: "Sg", name: "Seaborgio", c: 6, r: 7, color: "c-transition" },
-      { n: 107, s: "Bh", name: "Bohrio", c: 7, r: 7, color: "c-transition" },
-      { n: 108, s: "Hs", name: "Hassio", c: 8, r: 7, color: "c-transition" },
-      { n: 109, s: "Mt", name: "Meitnerio", c: 9, r: 7, color: "c-transition" },
-      { n: 110, s: "Ds", name: "Darmstatio", c: 10, r: 7, color: "c-transition" },
-      { n: 111, s: "Rg", name: "Roentgenio", c: 11, r: 7, color: "c-transition" },
-      { n: 112, s: "Cn", name: "Copernicio", c: 12, r: 7, color: "c-transition" },
-      { n: 113, s: "Nh", name: "Nihonio", c: 13, r: 7, color: "c-post-metal" },
-      { n: 114, s: "Fl", name: "Flerovio", c: 14, r: 7, color: "c-post-metal" },
-      { n: 115, s: "Mc", name: "Moscovio", c: 15, r: 7, color: "c-post-metal" },
-      { n: 116, s: "Lv", name: "Livermorio", c: 16, r: 7, color: "c-post-metal" },
-      { n: 117, s: "Ts", name: "Tenesino", c: 17, r: 7, color: "c-halogen" },
-      { n: 118, s: "Og", name: "Oganeson", c: 18, r: 7, color: "c-noble-gas" },
+      // Periodo 7
+      { n: 87, s: "Fr", name: "Francio", row: 7, col: 1, cat: "alcalinos", folder: "87-francio", file: "87-FRANCIO" },
+      { n: 88, s: "Ra", name: "Radio", row: 7, col: 2, cat: "alcalinoterreos", folder: "88-radio", file: "88-RADIO" },
+      // 89-103 Actínidos en fila 10
+      { n: 104, s: "Rf", name: "Rutherfordio", row: 7, col: 4, cat: "transicion", folder: "104-rutherfordio", file: "104-RUTHERFORDIO" },
+      { n: 105, s: "Db", name: "Dubnio", row: 7, col: 5, cat: "transicion", folder: "105-dubnio", file: "105-DUBNIO" },
+      { n: 106, s: "Sg", name: "Seaborgio", row: 7, col: 6, cat: "transicion", folder: "106-seaborgio", file: "106-SEABORGIO" },
+      { n: 107, s: "Bh", name: "Bohrio", row: 7, col: 7, cat: "transicion", folder: "107-bohrio", file: "107-BOHRIO" },
+      { n: 108, s: "Hs", name: "Hassio", row: 7, col: 8, cat: "transicion", folder: "108-hassio", file: "108-HASSIO" },
+      { n: 109, s: "Mt", name: "Meitnerio", row: 7, col: 9, cat: "transicion", folder: "109-meitnerio", file: "109-MEITNERIO" },
+      { n: 110, s: "Ds", name: "Darmstatio", row: 7, col: 10, cat: "transicion", folder: "110-darmstatio", file: "110-DARMSTATIO" },
+      { n: 111, s: "Rg", name: "Roentgenio", row: 7, col: 11, cat: "transicion", folder: "111-roentgenio", file: "111-ROENTGENIO" },
+      { n: 112, s: "Cn", name: "Copernicio", row: 7, col: 12, cat: "transicion", folder: "112-copernicio", file: "112-COPERNICIO" },
+      { n: 113, s: "Nh", name: "Nihonio", row: 7, col: 13, cat: "otros-metales", folder: "113-nihonio", file: "113-NIHONIO" },
+      { n: 114, s: "Fl", name: "Flerovio", row: 7, col: 14, cat: "otros-metales", folder: "114-flerovio", file: "114-FLEROVIO" },
+      { n: 115, s: "Mc", name: "Moscovio", row: 7, col: 15, cat: "otros-metales", folder: "115-moscovio", file: "115-MOSCOVIO" },
+      { n: 116, s: "Lv", name: "Livermorio", row: 7, col: 16, cat: "otros-metales", folder: "116-livermorio", file: "116-LIVERMORIO" },
+      { n: 117, s: "Ts", name: "Teneso", row: 7, col: 17, cat: "halogenos", folder: "117-teneso", file: "117-TENESO" },
+      { n: 118, s: "Og", name: "Oganesón", row: 7, col: 18, cat: "gases-nobles", folder: "118-oganeson", file: "118-OGANESON" },
 
-      // Lantánidos (57 al 71) en fila 9, columnas 4 a 18
-      { n: 57, s: "La", name: "Lantano", c: 4, r: 9, color: "c-lanthanide" },
-      { n: 58, s: "Ce", name: "Cerio", c: 5, r: 9, color: "c-lanthanide" },
-      { n: 59, s: "Pr", name: "Praseodimio", c: 6, r: 9, color: "c-lanthanide" },
-      { n: 60, s: "Nd", name: "Neodimio", c: 7, r: 9, color: "c-lanthanide" },
-      { n: 61, s: "Pm", name: "Prometio", c: 8, r: 9, color: "c-lanthanide" },
-      { n: 62, s: "Sm", name: "Samario", c: 9, r: 9, color: "c-lanthanide" },
-      { n: 63, s: "Eu", name: "Europio", c: 10, r: 9, color: "c-lanthanide" },
-      { n: 64, s: "Gd", name: "Gadolinio", c: 11, r: 9, color: "c-lanthanide" },
-      { n: 65, s: "Tb", name: "Terbio", c: 12, r: 9, color: "c-lanthanide" },
-      { n: 66, s: "Dy", name: "Disprosio", c: 13, r: 9, color: "c-lanthanide" },
-      { n: 67, s: "Ho", name: "Holmio", c: 14, r: 9, color: "c-lanthanide" },
-      { n: 68, s: "Er", name: "Erbio", c: 15, r: 9, color: "c-lanthanide" },
-      { n: 69, s: "Tm", name: "Tulio", c: 16, r: 9, color: "c-lanthanide" },
-      { n: 70, s: "Yb", name: "Iterbio", c: 17, r: 9, color: "c-lanthanide" },
-      { n: 71, s: "Lu", name: "Lutecio", c: 18, r: 9, color: "c-lanthanide" },
+      // Lantánidos (Fila 9, columnas 4 a 18)
+      { n: 57, s: "La", name: "Lantano", row: 9, col: 4, cat: "lantanidos", folder: "57-lantano", file: "57-LANTANO" },
+      { n: 58, s: "Ce", name: "Cerio", row: 9, col: 5, cat: "lantanidos", folder: "58-cerio", file: "58-CERIO" },
+      { n: 59, s: "Pr", name: "Praseodimio", row: 9, col: 6, cat: "lantanidos", folder: "59-praseodimio", file: "59-PRASEODIMIO" },
+      { n: 60, s: "Nd", name: "Neodimio", row: 9, col: 7, cat: "lantanidos", folder: "60-neodimio", file: "60-NEODIMIO" },
+      { n: 61, s: "Pm", name: "Prometio", row: 9, col: 8, cat: "lantanidos", folder: "61-prometio", file: "61-PROMETIO" },
+      { n: 62, s: "Sm", name: "Samario", row: 9, col: 9, cat: "lantanidos", folder: "62-samario", file: "62-SAMARIO" },
+      { n: 63, s: "Eu", name: "Europio", row: 9, col: 10, cat: "lantanidos", folder: "63-europio", file: "63-EUROPIO" },
+      { n: 64, s: "Gd", name: "Gadolinio", row: 9, col: 11, cat: "lantanidos", folder: "64-gadolinio", file: "64-GADOLINIO" },
+      { n: 65, s: "Tb", name: "Terbio", row: 9, col: 12, cat: "lantanidos", folder: "65-terbio", file: "65-TERBIO" },
+      { n: 66, s: "Dy", name: "Disprosio", row: 9, col: 13, cat: "lantanidos", folder: "66-disprosio", file: "66-DISPROSIO" },
+      { n: 67, s: "Ho", name: "Holmio", row: 9, col: 14, cat: "lantanidos", folder: "67-holmio", file: "67-HOLMIO" },
+      { n: 68, s: "Er", name: "Erbio", row: 9, col: 15, cat: "lantanidos", folder: "68-erbio", file: "68-ERBIO" },
+      { n: 69, s: "Tm", name: "Tulio", row: 9, col: 16, cat: "lantanidos", folder: "69-tulio", file: "69-TULIO" },
+      { n: 70, s: "Yb", name: "Iterbio", row: 9, col: 17, cat: "lantanidos", folder: "70-iterbio", file: "70-ITERBIO" },
+      { n: 71, s: "Lu", name: "Lutecio", row: 9, col: 18, cat: "lantanidos", folder: "71-lutecio", file: "71-LUTECIO" },
 
-      // Actínidos (89 al 103) en fila 10, columnas 4 a 18
-      { n: 89, s: "Ac", name: "Actinio", c: 4, r: 10, color: "c-actinide" },
-      { n: 90, s: "Th", name: "Torio", c: 5, r: 10, color: "c-actinide" },
-      { n: 91, s: "Pa", name: "Protactinio", c: 6, r: 10, color: "c-actinide" },
-      { n: 92, s: "U", name: "Uranio", c: 7, r: 10, color: "c-actinide" },
-      { n: 93, s: "Np", name: "Neptunio", c: 8, r: 10, color: "c-actinide" },
-      { n: 94, s: "Pu", name: "Plutonio", c: 9, r: 10, color: "c-actinide" },
-      { n: 95, s: "Am", name: "Americio", c: 10, r: 10, color: "c-actinide" },
-      { n: 96, s: "Cm", name: "Curio", c: 11, r: 10, color: "c-actinide" },
-      { n: 97, s: "Bk", name: "Berkelio", c: 12, r: 10, color: "c-actinide" },
-      { n: 98, s: "Cf", name: "Californio", c: 13, r: 10, color: "c-actinide" },
-      { n: 99, s: "Es", name: "Einstenio", c: 14, r: 10, color: "c-actinide" },
-      { n: 100, s: "Fm", name: "Fermio", c: 15, r: 10, color: "c-actinide" },
-      { n: 101, s: "Md", name: "Mendelevio", c: 16, r: 10, color: "c-actinide" },
-      { n: 102, s: "No", name: "Nobelio", c: 17, r: 10, color: "c-actinide" },
-      { n: 103, s: "Lr", name: "Laurencio", c: 18, r: 10, color: "c-actinide" }
+      // Actínidos (Fila 10, columnas 4 a 18)
+      { n: 89, s: "Ac", name: "Actinio", row: 10, col: 4, cat: "actinidos", folder: "89-actinio", file: "89-ACTINIO" },
+      { n: 90, s: "Th", name: "Torio", row: 10, col: 5, cat: "actinidos", folder: "90-torio", file: "90-TORIO" },
+      { n: 91, s: "Pa", name: "Protactinio", row: 10, col: 6, cat: "actinidos", folder: "91-protactinio", file: "91-PROTACTINIO" },
+      { n: 92, s: "U", name: "Uranio", row: 10, col: 7, cat: "actinidos", folder: "92-uranio", file: "92-URANIO" },
+      { n: 93, s: "Np", name: "Neptunio", row: 10, col: 8, cat: "actinidos", folder: "93-neptunio", file: "93-NEPTUNIO" },
+      { n: 94, s: "Pu", name: "Plutonio", row: 10, col: 9, cat: "actinidos", folder: "94-plutonio", file: "94-PLUTONIO" },
+      { n: 95, s: "Am", name: "Americio", row: 10, col: 10, cat: "actinidos", folder: "95-americio", file: "95-AMERICIO" },
+      { n: 96, s: "Cm", name: "Curio", row: 10, col: 11, cat: "actinidos", folder: "96-curio", file: "96-CURIO" },
+      { n: 97, s: "Bk", name: "Berkelio", row: 10, col: 12, cat: "actinidos", folder: "97-berkelio", file: "97-BERKELIO" },
+      { n: 98, s: "Cf", name: "Californio", row: 10, col: 13, cat: "actinidos", folder: "98-californio", file: "98-CALIFORNIO" },
+      { n: 99, s: "Es", name: "Einstenio", row: 10, col: 14, cat: "actinidos", folder: "99-einstenio", file: "99-EINSTENIO" },
+      { n: 100, s: "Fm", name: "Fermio", row: 10, col: 15, cat: "actinidos", folder: "100-fermio", file: "100-FERMIO" },
+      { n: 101, s: "Md", name: "Mendelevio", row: 10, col: 16, cat: "actinidos", folder: "101-mendelevio", file: "101-MENDELEVIO" },
+      { n: 102, s: "No", name: "Nobelio", row: 10, col: 17, cat: "actinidos", folder: "102-nobelio", file: "102-NOBELIO" },
+      { n: 103, s: "Lr", name: "Laurencio", row: 10, col: 18, cat: "actinidos", folder: "103-laurencio", file: "103-LAURENCIO" }
     ];
 
-    const table = document.getElementById('table');
+    const grid = document.getElementById('periodicTable');
 
-    // Casillas guía 57-71 y 89-103 en el cuerpo principal
-    const phLan = document.createElement('div');
-    phLan.className = 'placeholder c-lanthanide';
-    phLan.style.gridColumn = '3';
-    phLan.style.gridRow = '6';
-    phLan.innerHTML = '<span>57-71</span><span>Lantánidos</span>';
-    table.appendChild(phLan);
+    // 1. Casillas marcadoras oficiales de los Lantánidos y Actínidos en el cuerpo principal
+    const markerLa = document.createElement('div');
+    markerLa.className = 'series-marker lantanidos';
+    markerLa.style.gridRow = '6';
+    markerLa.style.gridColumn = '3';
+    markerLa.innerHTML = '57-71<br>La-Lu';
+    grid.appendChild(markerLa);
 
-    const phAct = document.createElement('div');
-    phAct.className = 'placeholder c-actinide';
-    phAct.style.gridColumn = '3';
-    phAct.style.gridRow = '7';
-    phAct.innerHTML = '<span>89-103</span><span>Actínidos</span>';
-    table.appendChild(phAct);
+    const markerAc = document.createElement('div');
+    markerAc.className = 'series-marker actinidos';
+    markerAc.style.gridRow = '7';
+    markerAc.style.gridColumn = '3';
+    markerAc.innerHTML = '89-103<br>Ac-Lr';
+    grid.appendChild(markerAc);
 
-    // Generar las 118 casillas
+    // 2. Fila espaciadora entre el bloque principal y las tierras raras
+    const separator = document.createElement('div');
+    separator.className = 'row-separator';
+    separator.style.gridRow = '8';
+    grid.appendChild(separator);
+
+    // 3. Renderizar los 118 elementos en sus coordenadas exactas
     elements.forEach(el => {
-      const numStr = String(el.n).padStart(2, '0');
-      const nombreUpper = el.name.toUpperCase();
-      const folderName = `${numStr}-${el.name.toLowerCase()}`;
-      const fileName = `${numStr}-${nombreUpper}.html`;
+      const a = document.createElement('a');
+      a.href = `modelos/${el.folder}/${el.file}.html`;
+      a.className = `element-card ${el.cat}`;
+      a.setAttribute('data-symbol', el.s);
+      a.style.gridRow = el.row;
+      a.style.gridColumn = el.col;
+      a.title = `${el.n}. ${el.name} (${el.s})`;
 
-      const link = document.createElement('a');
-      link.className = `element-card ${el.color}`;
-      link.href = `modelos/${folderName}/${fileName}`;
-      link.style.gridColumn = el.c;
-      link.style.gridRow = el.r;
-      link.title = `${el.n} - ${el.name} (${el.s})`;
-
-      link.innerHTML = `
+      a.innerHTML = `
         <span class="atomic-num">${el.n}</span>
         <span class="symbol">${el.s}</span>
         <span class="name">${el.name}</span>
       `;
-      table.appendChild(link);
+      grid.appendChild(a);
     });
   </script>
 </body>
