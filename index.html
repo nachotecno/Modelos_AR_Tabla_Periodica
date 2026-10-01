@@ -3,24 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tabla Periódica - Modelos AR 3D</title>
+  <title>Tabla Periódica de los Elementos de la IUPAC - Modelos AR 3D</title>
   <style>
     :root {
-      --bg-color: #0f141c;
-      --card-bg: #1a2232;
-      --text-main: #f0f4f8;
+      --bg-color: #ffffff;
+      --text-dark: #000000;
+      --text-light: #ffffff;
       
-      /* Colores póster IUPAC */
-      --c-alcalinos: #ff6f61;        /* Rojo / Salmón */
-      --c-alcalinoterreos: #ffb74d;  /* Naranja */
-      --c-transicion: #ffe082;       /* Amarillo suave */
-      --c-otros-metales: #80cbc4;    /* Verde agua / turquesa */
-      --c-semimetales: #2e7d32;      /* Verde oscuro */
-      --c-no-metales: #90caf9;       /* Azul claro */
-      --c-halogenos: #1565c0;        /* Azul oscuro */
-      --c-gases-nobles: #ce93d8;     /* Púrpura / Lila */
-      --c-lantanidos: #f48fb1;       /* Rosa */
-      --c-actinidos: #b39ddb;        /* Violeta claro */
+      /* Paleta exacta del póster IUPAC oficial */
+      --c-alcalinos: #e52420;        /* Rojo vivo */
+      --c-alcalinoterreos: #f59c1a;  /* Naranja */
+      --c-transicion: #fff53b;       /* Amarillo brillante */
+      --c-otros-metales: #81cf74;    /* Verde claro */
+      --c-semimetales: #009344;      /* Verde intenso */
+      --c-no-metales: #4ec3e0;       /* Azul celeste */
+      --c-halogenos: #0077c8;        /* Azul medio */
+      --c-gases-nobles: #f5a3b8;     /* Rosa */
+      --c-lantanidos: #e8ecf1;       /* Gris muy claro */
+      --c-actinidos: #5c6bc0;        /* Azul violeta */
     }
 
     * {
@@ -30,10 +30,10 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       background-color: var(--bg-color);
-      color: var(--text-main);
-      padding: 18px 12px;
+      color: #111111;
+      padding: 16px 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -41,76 +41,73 @@
 
     header {
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     h1 {
-      font-size: 1.6rem;
-      letter-spacing: 0.5px;
-      color: #ffffff;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #000000;
       margin-bottom: 4px;
     }
 
     p.subtitle {
-      font-size: 0.9rem;
-      color: #94a3b8;
+      font-size: 0.88rem;
+      color: #555555;
     }
 
-    /* Contenedor con scroll horizontal suave para móviles */
+    /* Contenedor responsivo con desplazamiento suave */
     .table-viewport {
       width: 100%;
-      max-width: 1240px;
+      max-width: 1260px;
       overflow-x: auto;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
     }
 
-    /* Rejilla oficial de 18 columnas */
+    /* Rejilla de 18 columnas */
     .periodic-grid {
       display: grid;
       grid-template-columns: repeat(18, minmax(62px, 1fr));
-      grid-template-rows: repeat(10, minmax(62px, auto));
-      gap: 4px;
-      min-width: 1140px;
+      grid-template-rows: repeat(10, minmax(64px, auto));
+      gap: 3px;
+      min-width: 1160px;
       margin: 0 auto;
     }
 
-    /* Estilo base de celda / botón del elemento */
+    /* Celda / Botón de elemento */
     .element-card {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-radius: 5px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
       text-decoration: none;
-      padding: 3px 2px;
+      padding: 2px;
       position: relative;
-      transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
       user-select: none;
     }
 
     .element-card:hover {
-      transform: translateY(-2px) scale(1.05);
+      transform: scale(1.06);
       z-index: 10;
-      filter: brightness(1.12);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
     }
 
     .atomic-num {
       position: absolute;
       top: 2px;
       left: 3px;
-      font-size: 9px;
+      font-size: 9.5px;
       font-weight: 700;
-      opacity: 0.85;
       line-height: 1;
     }
 
     .symbol {
-      font-size: 19px;
+      font-size: 20px;
       font-weight: 800;
       line-height: 1.1;
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
     .name {
@@ -121,52 +118,61 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 96%;
+      max-width: 98%;
     }
 
-    /* Ajuste especial y único para el Rutherfordio */
+    /* Rutherfordio completo sin desbordar */
     .element-card[data-symbol="Rf"] .name {
       font-size: 8px !important;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.35px;
     }
 
-    /* Casillas marcadoras de serie Lantánidos y Actínidos */
+    /* Casillas especiales 57-71 Lantánidos y 89-103 Actínidos */
     .series-marker {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-radius: 5px;
-      font-size: 10px;
-      font-weight: 700;
+      border: 1px solid rgba(0, 0, 0, 0.2);
       text-align: center;
-      padding: 4px;
-      line-height: 1.15;
-      border: 1px dashed rgba(255, 255, 255, 0.3);
+      padding: 2px;
+      user-select: none;
     }
 
-    /* Clases de Color según póster IUPAC */
-    .alcalinos { background-color: var(--c-alcalinos); color: #000000; }
-    .alcalinoterreos { background-color: var(--c-alcalinoterreos); color: #000000; }
-    .transicion { background-color: var(--c-transicion); color: #000000; }
-    .otros-metales { background-color: var(--c-otros-metales); color: #000000; }
-    .semimetales { background-color: var(--c-semimetales); color: #ffffff; }
-    .no-metales { background-color: var(--c-no-metales); color: #000000; }
-    .halogenos { background-color: var(--c-halogenos); color: #ffffff; }
-    .gases-nobles { background-color: var(--c-gases-nobles); color: #000000; }
-    .lantanidos { background-color: var(--c-lantanidos); color: #000000; }
-    .actinidos { background-color: var(--c-actinidos); color: #000000; }
+    .series-marker .series-num {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
 
-    /* Fila vacía separadora entre tabla principal y tierras raras */
+    .series-marker .series-name {
+      font-size: 9.5px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    /* Asignación cromática IUPAC */
+    .alcalinos { background-color: var(--c-alcalinos); color: var(--text-light); }
+    .alcalinoterreos { background-color: var(--c-alcalinoterreos); color: var(--text-dark); }
+    .transicion { background-color: var(--c-transicion); color: var(--text-dark); }
+    .otros-metales { background-color: var(--c-otros-metales); color: var(--text-dark); }
+    .semimetales { background-color: var(--c-semimetales); color: var(--text-light); }
+    .no-metales { background-color: var(--c-no-metales); color: var(--text-dark); }
+    .halogenos { background-color: var(--c-halogenos); color: var(--text-light); }
+    .gases-nobles { background-color: var(--c-gases-nobles); color: var(--text-dark); }
+    .lantanidos { background-color: var(--c-lantanidos); color: var(--text-dark); }
+    .actinidos { background-color: var(--c-actinidos); color: var(--text-light); }
+
+    /* Separador horizontal */
     .row-separator {
       grid-column: 1 / span 18;
-      height: 12px;
+      height: 14px;
     }
 
-    /* Leyenda inferior en UNA SOLA LÍNEA */
+    /* Leyenda en UNA SOLA LÍNEA */
     .legend-container {
       width: 100%;
-      max-width: 1240px;
+      max-width: 1260px;
       margin-top: 14px;
       overflow-x: auto;
       padding-bottom: 6px;
@@ -174,31 +180,32 @@
 
     .legend {
       display: flex;
-      flex-wrap: nowrap; /* Evita que salte de línea */
+      flex-wrap: nowrap;
       justify-content: center;
       align-items: center;
-      gap: 10px;
-      min-width: 980px; /* Asegura lectura cómoda */
-      background: #141c28;
+      gap: 12px;
+      min-width: 1050px;
+      background: #f7f9fa;
+      border: 1px solid #dcdcdc;
       padding: 9px 14px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      border-radius: 6px;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      font-weight: 500;
-      color: #cbd5e1;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #333333;
       white-space: nowrap;
     }
 
     .legend-color {
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
+      width: 15px;
+      height: 15px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 2px;
       flex-shrink: 0;
     }
   </style>
@@ -206,17 +213,17 @@
 <body>
 
   <header>
-    <h1>Tabla Periódica de los Elementos en Realidad Aumentada</h1>
-    <p class="subtitle">Pulsa sobre cualquier elemento para ver su modelo atómico de Bohr en 3D y RA (iPhone / Android / PC)</p>
+    <h1>Tabla Periódica de los Elementos de la IUPAC</h1>
+    <p class="subtitle">Pulsa sobre cualquier elemento para interactuar con su modelo atómico de Bohr en Realidad Aumentada</p>
   </header>
 
   <div class="table-viewport">
     <main class="periodic-grid" id="periodicTable">
-      <!-- Los 118 elementos se colocan dinámicamente con las coordenadas exactas de la IUPAC -->
+      <!-- Generado dinámicamente con JavaScript -->
     </main>
   </div>
 
-  <!-- Leyenda de colores IUPAC en una sola fila continua -->
+  <!-- Leyenda en una sola línea continua -->
   <div class="legend-container">
     <footer class="legend">
       <div class="legend-item"><span class="legend-color alcalinos"></span>Alcalinos</div>
@@ -233,7 +240,6 @@
   </div>
 
   <script>
-    // Datos completos de los 118 elementos con la clasificación de colores y coordenadas IUPAC solicitadas
     const elements = [
       // Periodo 1
       { n: 1, s: "H", name: "Hidrógeno", row: 1, col: 1, cat: "no-metales", folder: "01-hidrogeno", file: "01-HIDROGENO" },
@@ -302,7 +308,6 @@
       // Periodo 6
       { n: 55, s: "Cs", name: "Cesio", row: 6, col: 1, cat: "alcalinos", folder: "55-cesio", file: "55-CESIO" },
       { n: 56, s: "Ba", name: "Bario", row: 6, col: 2, cat: "alcalinoterreos", folder: "56-bario", file: "56-BARIO" },
-      // 57-71 Lantánidos en fila 9
       { n: 72, s: "Hf", name: "Hafnio", row: 6, col: 4, cat: "transicion", folder: "72-hafnio", file: "72-HAFNIO" },
       { n: 73, s: "Ta", name: "Tántalo", row: 6, col: 5, cat: "transicion", folder: "73-tantalo", file: "73-TANTALO" },
       { n: 74, s: "W", name: "Wolframio", row: 6, col: 6, cat: "transicion", folder: "74-wolframio", file: "74-WOLFRAMIO" },
@@ -322,7 +327,6 @@
       // Periodo 7
       { n: 87, s: "Fr", name: "Francio", row: 7, col: 1, cat: "alcalinos", folder: "87-francio", file: "87-FRANCIO" },
       { n: 88, s: "Ra", name: "Radio", row: 7, col: 2, cat: "alcalinoterreos", folder: "88-radio", file: "88-RADIO" },
-      // 89-103 Actínidos en fila 10
       { n: 104, s: "Rf", name: "Rutherfordio", row: 7, col: 4, cat: "transicion", folder: "104-rutherfordio", file: "104-RUTHERFORDIO" },
       { n: 105, s: "Db", name: "Dubnio", row: 7, col: 5, cat: "transicion", folder: "105-dubnio", file: "105-DUBNIO" },
       { n: 106, s: "Sg", name: "Seaborgio", row: 7, col: 6, cat: "transicion", folder: "106-seaborgio", file: "106-SEABORGIO" },
@@ -339,7 +343,7 @@
       { n: 117, s: "Ts", name: "Teneso", row: 7, col: 17, cat: "halogenos", folder: "117-teneso", file: "117-TENESO" },
       { n: 118, s: "Og", name: "Oganesón", row: 7, col: 18, cat: "gases-nobles", folder: "118-oganeson", file: "118-OGANESON" },
 
-      // Lantánidos (Fila 9, columnas 4 a 18)
+      // Lantánidos (Fila 9)
       { n: 57, s: "La", name: "Lantano", row: 9, col: 4, cat: "lantanidos", folder: "57-lantano", file: "57-LANTANO" },
       { n: 58, s: "Ce", name: "Cerio", row: 9, col: 5, cat: "lantanidos", folder: "58-cerio", file: "58-CERIO" },
       { n: 59, s: "Pr", name: "Praseodimio", row: 9, col: 6, cat: "lantanidos", folder: "59-praseodimio", file: "59-PRASEODIMIO" },
@@ -356,7 +360,7 @@
       { n: 70, s: "Yb", name: "Iterbio", row: 9, col: 17, cat: "lantanidos", folder: "70-iterbio", file: "70-ITERBIO" },
       { n: 71, s: "Lu", name: "Lutecio", row: 9, col: 18, cat: "lantanidos", folder: "71-lutecio", file: "71-LUTECIO" },
 
-      // Actínidos (Fila 10, columnas 4 a 18)
+      // Actínidos (Fila 10)
       { n: 89, s: "Ac", name: "Actinio", row: 10, col: 4, cat: "actinidos", folder: "89-actinio", file: "89-ACTINIO" },
       { n: 90, s: "Th", name: "Torio", row: 10, col: 5, cat: "actinidos", folder: "90-torio", file: "90-TORIO" },
       { n: 91, s: "Pa", name: "Protactinio", row: 10, col: 6, cat: "actinidos", folder: "91-protactinio", file: "91-PROTACTINIO" },
@@ -376,28 +380,29 @@
 
     const grid = document.getElementById('periodicTable');
 
-    // 1. Casillas marcadoras oficiales de los Lantánidos y Actínidos en el cuerpo principal
+    // 1. Casilla oficial 57-71 Lantánidos (mismo fondo gris claro que su fila)
     const markerLa = document.createElement('div');
     markerLa.className = 'series-marker lantanidos';
     markerLa.style.gridRow = '6';
     markerLa.style.gridColumn = '3';
-    markerLa.innerHTML = '57-71<br>La-Lu';
+    markerLa.innerHTML = '<span class="series-num">57-71</span><span class="series-name">Lantánidos</span>';
     grid.appendChild(markerLa);
 
+    // 2. Casilla oficial 89-103 Actínidos (mismo fondo violeta y letra blanca que su fila)
     const markerAc = document.createElement('div');
     markerAc.className = 'series-marker actinidos';
     markerAc.style.gridRow = '7';
     markerAc.style.gridColumn = '3';
-    markerAc.innerHTML = '89-103<br>Ac-Lr';
+    markerAc.innerHTML = '<span class="series-num">89-103</span><span class="series-name">Actínidos</span>';
     grid.appendChild(markerAc);
 
-    // 2. Fila espaciadora entre el bloque principal y las tierras raras
+    // 3. Fila separadora entre tabla principal y tierras raras
     const separator = document.createElement('div');
     separator.className = 'row-separator';
     separator.style.gridRow = '8';
     grid.appendChild(separator);
 
-    // 3. Renderizar los 118 elementos en sus coordenadas exactas
+    // 4. Inserción de los 118 elementos
     elements.forEach(el => {
       const a = document.createElement('a');
       a.href = `modelos/${el.folder}/${el.file}.html`;
